@@ -1,9 +1,9 @@
+import Config from './config.js'
 import Pipe from './pipe.js'
 import loadImage from './utils.js'
 import Ground from './ground.js'
 import Bird from './bird.js'
 import Score from './score.js'
-import Config from './config.js'
 
 class Game {
 	constructor(canvas) {
