@@ -153,7 +153,7 @@ class Game {
 	updatePipes() {
 		for (let i = 0; i < this.pipes.length; i++) {
 			this.pipes[i].update()	
-			if (Math.ceil(this.pipes[i].x) == this.bird.x) {
+			if (this.pipes[i].x <= this.bird.x <= this.pipes[i].x + this.config.pipe.width {
 				this.score.update()
 				if (this.score.score > this.score.localScore) {
 					this.score.localScore = localStorage.setItem('highScore', this.score.score)
