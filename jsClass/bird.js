@@ -36,8 +36,8 @@ class Bird {
 	}
 
 	flap() {
-		this.config.FLAP.play();
-		this.config.FLAP.currentTime = 0;
+		// this.config.FLAP.play();
+		// this.config.FLAP.currentTime = 0;
 		this.config.velocity = -this.config.flapPower
 	}
 
