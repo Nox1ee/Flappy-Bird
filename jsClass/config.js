@@ -32,14 +32,15 @@ class Config {
         width: 2000, // Ширина земли
     }
 
-    gravity = 0.03 // скорость падения
-    flapPower = 1.8 // скорость взмахов крыльев
+    gravity = 0.1// скорость падения
+    flapPower = 2.5 // скорость взмахов крыльев
     velocity = 0 // Начальная скорость
-    DISTANCE_BETWEEN_PIPES = 4 * this.pipe.width // Расстояние между трубами
+    DISTANCE_BETWEEN_PIPES = 2 * this.pipe.width // Расстояние между трубами
     SPEED = 2.5// Скорость
     INDEX = 0 // Индекс
     frameCount = 0 // Количетсво кадров
 }
 
 export default Config;
+
 
