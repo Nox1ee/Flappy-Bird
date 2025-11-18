@@ -89,7 +89,7 @@ class Game {
 
 	gameLoop() {
 		let render = () => {
-			this.config.INDEX += 0.3
+			this.config.INDEX += 1
 
 			this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height)
 
