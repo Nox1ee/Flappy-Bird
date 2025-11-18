@@ -32,7 +32,7 @@ class Config {
         width: 2000, // Ширина земли
     }
 
-    gravity = 0.15 //скорость падения
+    gravity = 0.2 // скорость падения
     flapPower = 4 // скорость взмахов крыльев
     velocity = 0 // Начальная скорость
     DISTANCE_BETWEEN_PIPES = 1.5 * this.pipe.width // Расстояние между трубами
@@ -42,6 +42,7 @@ class Config {
 }
 
 export default Config;
+
 
 
 
