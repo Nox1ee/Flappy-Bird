@@ -33,7 +33,7 @@ class Config {
     }
 
     gravity = 0.15 //скорость падения
-    flapPower = 3 // скорость взмахов крыльев
+    flapPower = 4 // скорость взмахов крыльев
     velocity = 0 // Начальная скорость
     DISTANCE_BETWEEN_PIPES = 1.5 * this.pipe.width // Расстояние между трубами
     SPEED = 2.5// Скорость
@@ -42,6 +42,7 @@ class Config {
 }
 
 export default Config;
+
 
 
 
