@@ -36,8 +36,9 @@ class Config {
     flapPower = 1.8 // скорость взмахов крыльев
     velocity = 0 // Начальная скорость
     DISTANCE_BETWEEN_PIPES = 4 * this.pipe.width // Расстояние между трубами
-    SPEED = 0.9 // Скорость
+    SPEED = 1.5 // Скорость
     INDEX = 0 // Индекс
     frameCount = 0 // Количетсво кадров
 }
+
 export default Config;
