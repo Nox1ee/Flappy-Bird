@@ -1,19 +1,19 @@
 class Config {
     constructor() {
-        this.FLAP = new Audio();
-		this.FLAP.src = './audio/sfx_flap.wav'
+        // Для мобильных устройств предзагружаем аудио
+        this.FLAP = this.createAudio('./audio/sfx_flap.wav');
+        this.HIT = this.createAudio('./audio/sfx_hit.wav');
+        this.SCORE_S = this.createAudio('./audio/sfx_point.wav');
+        this.DIE = this.createAudio('./audio/sfx_die.wav');
+        this.SWOOSHING = this.createAudio('./audio/sfx_swooshing.wav');
+    }
 
-        this.HIT = new Audio();
-        this.HIT.src = "audio/sfx_hit.wav";
-
-        this.SCORE_S = new Audio();
-        this.SCORE_S.src = "audio/sfx_point.wav";
-
-        this.DIE = new Audio();
-        this.DIE.src = "audio/sfx_die.wav";
-
-        this.SWOOSHING = new Audio();
-        this.SWOOSHING.src = "audio/sfx_swooshing.wav";
+    createAudio(src) {
+        const audio = new Audio();
+        audio.preload = 'auto';
+        audio.src = src;
+        audio.load();
+        return audio;
     }
 
     pipe = {
@@ -32,18 +32,12 @@ class Config {
         width: 2000, // Ширина земли
     }
 
-    gravity = 0.2 // скорость падения
-    flapPower = 4 // скорость взмахов крыльев
+    gravity = 0.4 // скорость падения
+    flapPower = 6 // скорость взмахов крыльев
     velocity = 0 // Начальная скорость
-    DISTANCE_BETWEEN_PIPES = 1.5 * this.pipe.width // Расстояние между трубами
-    SPEED = 2.5// Скорость
+    DISTANCE_BETWEEN_PIPES = 1 * this.pipe.width // Расстояние между трубами
+    SPEED = 4 // Скорость
     INDEX = 0 // Индекс
     frameCount = 0 // Количетсво кадров
 }
-
 export default Config;
-
-
-
-
-
