@@ -1,9 +1,9 @@
-import Config from './config.js'
 import Pipe from './pipe.js'
 import loadImage from './utils.js'
 import Ground from './ground.js'
 import Bird from './bird.js'
 import Score from './score.js'
+import Config from './config.js'
 
 class Game {
 	constructor(canvas) {
@@ -25,25 +25,15 @@ class Game {
 		this.score = new Score(this.canvas) // экземпляр счета очков
 
 		this.request = 0
+		this.request1 = 0
+
+		this.lastTime = 0;
+        this.deltaTime = 0;
+        this.accumulator = 0;
+        this.fixedTimeStep = 1000 / 60; // 60 FPS
 	}
 
-	async loadAssets() {
-		await Promise.all([
-			loadImage(this.BG_IMG, this.BG_SRC), // грузим фоновое изображение
-			Pipe.preloadImage(), // грузим трубы
-			Ground.preloadImage(), // грузим землю
-			Bird.preloadImage(), // грузим птичку
-		])
-	}
-
-	loadImage(img, src) {
-		return new Promise((resolve, reject) => {
-			img.onload = resolve
-			img.onerror = reject
-			img.src = src
-		})
-	}
-
+	// Запуск игры по нажатию
 	launch = () => {
 		this.config.SWOOSHING.play();
 		window.cancelAnimationFrame(this.request)
@@ -57,20 +47,18 @@ class Game {
 	start() {
 		this.initializeControls() // управление птичкой
 
-		if ((this.score.localScore === null) || (this.score.localScore === undefined)) {
-			this.score.localScore = 0;
-		}
-
+		// Отрисовываем птичку и другие элементы до начала игры
 		const render = () => {
-			this.config.INDEX += 1
+			this.config.INDEX += 0.3
 
-			this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height)
-			this.ground.update(this.config.INDEX)
-			this.bird.draw(this.config.INDEX)
+			this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height) // Фон
+			this.ground.draw() // Земля
+			this.bird.draw(this.config.INDEX) // Птичка
 
 			this.request = window.requestAnimationFrame(render)
 		}
 		this.request = window.requestAnimationFrame(render)
+
 
 		document.addEventListener('mousedown', this.launch, true)
 		document.addEventListener('touchstart', this.launch, true)
@@ -78,54 +66,111 @@ class Game {
 	}
 
 	restart() {
-		const restartBtn = document.getElementById('restartBtn');
+		const restartBtn = document.getElementById('restartBtn'); // Находим кнопку
 
-		restartBtn.style.display = 'block'
+		restartBtn.style.display = 'block' // Задаем ей стиль 
 		
-		restartBtn.addEventListener('click', () => {  
-        	location.reload();
+		restartBtn.addEventListener('click', () => { // Перезагружаем страницу при нажатии
+        	location.reload(); 
         });
 	}
 
 	gameLoop() {
-		let render = () => {
-			this.config.INDEX += 1
-
-			this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height)
-
-			this.updatePipes() // отрисовка труб
-			this.ground.update(this.config.INDEX) // отрисовка земли
-			this.bird.update(this.config.INDEX) // отрисовка птички
-			this.score.displayScore() // отрисовка счетчика очков
-			this.score.displayLocalScore() // отрисовка рекорда
-
-			this.config.frameCount++
-
-			if (this.config.frameCount > this.config.DISTANCE_BETWEEN_PIPES) {
-				this.pipes.push(new Pipe(this.canvas))
-				this.config.frameCount = 0
+		const game = (currentTime = 0) => {
+			this.deltaTime = currentTime - this.lastTime;
+			this.lastTime = currentTime;
+			
+			// Ограничиваем максимальный deltaTime для избежания "spiral of death"
+			if (this.deltaTime > 100) this.deltaTime = 100;
+			
+			this.accumulator += this.deltaTime;
+			
+			while (this.accumulator >= this.fixedTimeStep) {
+				this.update(this.fixedTimeStep);
+				this.accumulator -= this.fixedTimeStep;
 			}
+			
+			let requestId = window.requestAnimationFrame((time) => game(time));
 
-			let requestId = window.requestAnimationFrame(render);
-
-			// проверка на столкновение с землей 
-			if (this.bird.y > this.ground.y) {
+			// Проверка коллизии
+			if (this.checkCollisions()) {
 				this.config.HIT.play();
 				this.config.DIE.play();
-				window.cancelAnimationFrame(requestId)
-				this.restart()
-			}
+				window.cancelAnimationFrame(requestId);
+				this.restart();
+        	}
 
-			// проверка на столкновение с трубами
-			if (this.checkPipeCollision(this.bird, this.pipes)) {
-				this.config.HIT.play();
-				this.config.DIE.play();
-				window.cancelAnimationFrame(requestId)
-				this.restart()
+			this.render();
+		}
+        
+        window.requestAnimationFrame(game);
+    }
+
+	update(deltaTime) {
+        const deltaFactor = deltaTime / (1000 / 60); // Нормализуем к 60 FPS
+		
+		// Обновляем землю
+		this.ground.update(deltaFactor)
+        
+        // Обновляем физику с учетом deltaTime
+		this.bird.update(deltaFactor)
+     
+        // Обновляем трубы
+        for (let pipe of this.pipes) {
+            pipe.update(deltaFactor);
+        }
+
+		// Добавляем новые трубы
+		if (this.config.frameCount > this.config.DISTANCE_BETWEEN_PIPES) {
+            this.pipes.push(new Pipe(this.canvas));
+            this.config.frameCount = 0;
+        }
+		this.config.frameCount++;
+
+		// Удаляем трубы за пределами поля
+		for (let i = 0; i < this.pipes.length; i++) {
+			if(this.pipes[i].isOffscreen()) {
+				this.pipes.shift()
+				i--
 			}
 		}
-		window.requestAnimationFrame(render);
-	}
+    
+		// Проверяем пролетела ли птичка трубу и увелчиваем счет
+		for (let pipe of this.pipes) {
+			if ((pipe.x < this.bird.x) && (!pipe.scored)) {
+				this.score.increase();
+				pipe.scored = true;
+			}
+		}
+
+		this.score.checkHighScore(); // Проверяем был ли побит рекорд
+    }
+
+	render() {
+		this.config.INDEX += 0.3;
+
+        // Отрисовка фона
+        this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height);
+        
+        // Отрисовка труб
+        for (let pipe of this.pipes) {
+            pipe.draw();
+        }
+	
+        this.ground.draw(); // Отрисовка земли
+        this.bird.draw(this.config.INDEX); // Отрисовка птички
+        this.score.draw(); // Отрисовка счета
+    }
+
+	checkCollisions() {
+        // Столкновение с землей
+        if (this.bird.y > this.ground.y) {
+            return true;
+        }
+        
+        // Столкновение с трубами
+        return this.checkPipeCollision(this.bird, this.pipes);
+    }
 
 	checkPipeCollision(bird, pipes) {
 		return pipes.some(
@@ -150,23 +195,6 @@ class Game {
 		)
 	}
 
-	updatePipes() {
-		for (let i = 0; i < this.pipes.length; i++) {
-			this.pipes[i].update()	
-			if ((this.pipes[i].x <= this.bird.x ) && ( this.bird.x <= this.pipes[i].x + this.config.pipe.width)) {
-				this.score.update()
-				if (this.score.score > this.score.localScore) {
-					this.score.localScore = localStorage.setItem('highScore', this.score.score)
-				}
-				this.score.localScore = localStorage.getItem('highScore')
-			}
-			if (this.pipes[i].isOffscreen()) {
-				this.pipes.shift()
-				i--
-			}
-		}
-	}
-
 	// для полёта птички
 	initializeControls() {
 		if ('ontouchstart' in window) {
@@ -180,6 +208,23 @@ class Game {
 	handleFlap = event => {
 		if (event.type === 'keydown' && event.code !== 'Space') return
 		this.bird.flap()
+	}
+
+	async loadAssets() {
+		await Promise.all([
+			loadImage(this.BG_IMG, this.BG_SRC), // грузим фоновое изображение
+			Pipe.preloadImage(), // грузим трубы
+			Ground.preloadImage(), // грузим землю
+			Bird.preloadImage(), // грузим птичку
+		])
+	}
+
+	loadImage(img, src) {
+		return new Promise((resolve, reject) => {
+			img.onload = resolve
+			img.onerror = reject
+			img.src = src
+		})
 	}
 }
 export default Game;
