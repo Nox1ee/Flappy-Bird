@@ -11,18 +11,32 @@ class Score {
 		this.ctx = this.canvas.getContext('2d')
 
         this.score = 0 // Количество очков
-		this.localScore = localStorage.getItem('highScore') // Рекорд
+		this.highScore = localStorage.getItem('highScore') || 0 // Рекорд
     }
 
-    update() {
-        this.score++
-        this.config.SPEED += 0.01
+	// Увеличение очков
+	increase() {
+		this.score++;
+		this.config.SPEED += 0.01
 		this.config.SCORE_S.play();
 		this.config.SCORE_S.currentTime = 0;
+	}
+
+	// Проверка рекорда
+    checkHighScore() { 
+		if (this.score > this.highScore) {
+			localStorage.setItem('highScore', this.score)
+		}
     }
 
+	// Отображение полей с очками
+	draw() { 
+		this.displayScore();
+		this.displayLocalScore();
+	}
+
+	// Стили для очков
     styleDisplay() {
-		// стили для очков
 		this.ctx.font = '30px Gorditas'
 		this.ctx.fillStyle = 'white'
 		this.ctx.textAlign = 'left'
@@ -32,8 +46,8 @@ class Score {
 		this.ctx.textBaseline = 'top'
 	}
 
+	// Поле с количеством очков
     displayScore() {
-		// рисуем поле с количеством очков
 		this.styleDisplay()
 		this.ctx.strokeText('Score: ', 10, 10)
 		this.ctx.fillText('Score: ', 10, 10)
@@ -41,13 +55,13 @@ class Score {
 		this.ctx.fillText(this.score, 110, 10)
 	}
 
+	// Поле с рекордом
     displayLocalScore() {
-		// рисуем поле с количеством очков в истории
 		this.styleDisplay()
 		this.ctx.strokeText('Best: ', 10, 50)
 		this.ctx.fillText('Best: ', 10, 50)
-		this.ctx.strokeText(this.localScore, 90, 50)
-		this.ctx.fillText(this.localScore, 90, 50)
+		this.ctx.strokeText(this.highScore, 90, 50)
+		this.ctx.fillText(this.highScore, 90, 50)
 	}
 }
 
