@@ -15,8 +15,8 @@ class Bird {
 
 		this.config = new Config()
 
-		this.x = this.canvas.width / 2 - this.config.bird.width * 2.5 // расположение птички по оси X
-		this.y = this.canvas.height / 2 // расположение птички по оси Y
+		this.x = 140 // расположение птички по оси X
+		this.y = 384 // расположение птички по оси Y
 	}
 
 	draw(index) {
@@ -36,16 +36,15 @@ class Bird {
 	}
 
 	flap() {
-		// this.config.FLAP.play();
-		// this.config.FLAP.currentTime = 0;
+		this.config.FLAP.play();
+		this.config.FLAP.currentTime = 0;
 		this.config.velocity = -this.config.flapPower
 	}
 
-	update(index) {
-		this.config.velocity += this.config.gravity
-		this.y += this.config.velocity
-		this.draw(index)
-	}
+	update(deltaFactor) {
+        this.config.velocity += this.config.gravity * deltaFactor;
+        this.y += this.config.velocity * deltaFactor;
+    }
 }
 
 export default Bird;
