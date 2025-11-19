@@ -55,11 +55,9 @@ class Pipe {
 		)
 	}
 
-	// движение трубы
-	update() {
-		this.x -= this.config.SPEED
-		this.draw()
-	}
+	update(deltaFactor) {
+        this.x -= this.config.SPEED * deltaFactor;
+    }
 
 	isOffscreen() {
 		return this.x < -this.config.pipe.width
