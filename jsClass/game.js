@@ -100,7 +100,7 @@ class Game {
 				this.restart();
         	}
 
-			this.render(this.fixedTimeStep);
+			this.render();
 		}
         
         window.requestAnimationFrame(game);
@@ -146,9 +146,8 @@ class Game {
 		this.score.checkHighScore(); // Проверяем был ли побит рекорд
     }
 
-	render(deltaTime) {
-		let deltaFactor = deltaTime / (1000 / 60)
-		this.config.INDEX += 0.3 * deltaFactor;
+	render() {
+		this.config.INDEX += 0.5;
 
         // Отрисовка фона
         this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height);
