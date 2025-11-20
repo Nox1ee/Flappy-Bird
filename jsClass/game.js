@@ -146,7 +146,8 @@ class Game {
 		this.score.checkHighScore(); // Проверяем был ли побит рекорд
     }
 
-	render(deltaFactor) {
+	render(deltaTime) {
+		let deltaFactor = deltaTime / (1000 / 60)
 		this.config.INDEX += 0.3 * deltaFactor;
 
         // Отрисовка фона
