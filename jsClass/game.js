@@ -34,11 +34,6 @@ class Game {
 
 	async loadAssets() {
 		await Promise.all([
-			this.config.FLAP,
-			this.config.HIT,
-			this.config.SCORE_S,
-			this.config.DIE,
-			this.config.SWOOSHING,
 			loadImage(this.BG_IMG, this.BG_SRC), // грузим фоновое изображение
 			Pipe.preloadImage(), // грузим трубы
 			Ground.preloadImage(), // грузим землю
@@ -48,7 +43,6 @@ class Game {
 
 	// Запуск игры по нажатию
 	launch = () => {
-		this.config.SWOOSHING.play();
 		window.cancelAnimationFrame(this.request)
 		this.gameLoop()
 		document.removeEventListener('mousedown', this.launch, true)
@@ -119,11 +113,8 @@ class Game {
 			
 			let requestId = window.requestAnimationFrame((time) => game(time));
 
-
 			// Проверка коллизии
 			if (this.checkCollisions()) {
-				this.config.HIT.play();
-				this.config.DIE.play();
 				window.cancelAnimationFrame(requestId);
 				this.restart();
         	}
