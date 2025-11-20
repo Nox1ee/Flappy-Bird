@@ -18,8 +18,8 @@ class Score {
 	increase() {
 		this.score++;
 		this.config.SPEED += 0.01
-		// this.config.SCORE_S.play();
-		// this.config.SCORE_S.currentTime = 0;
+		this.config.SCORE_S.play();
+		this.config.SCORE_S.currentTime = 0;
 	}
 
 	// Проверка рекорда
@@ -37,11 +37,11 @@ class Score {
 
 	// Стили для очков
     styleDisplay() {
-		this.ctx.font = '30px Gorditas'
+		this.ctx.font = '30px Teko'
 		this.ctx.fillStyle = 'white'
 		this.ctx.textAlign = 'left'
 
-		this.ctx.lineWidth = 8
+		this.ctx.lineWidth = 6
 		this.ctx.strokeStyle = '#533846'
 		this.ctx.textBaseline = 'top'
 	}
@@ -51,8 +51,8 @@ class Score {
 		this.styleDisplay()
 		this.ctx.strokeText('Score: ', 10, 10)
 		this.ctx.fillText('Score: ', 10, 10)
-		this.ctx.strokeText(this.score, 110, 10)
-		this.ctx.fillText(this.score, 110, 10)
+		this.ctx.strokeText(this.score, 75, 10)
+		this.ctx.fillText(this.score, 75, 10)
 	}
 
 	// Поле с рекордом
@@ -60,10 +60,9 @@ class Score {
 		this.styleDisplay()
 		this.ctx.strokeText('Best: ', 10, 50)
 		this.ctx.fillText('Best: ', 10, 50)
-		this.ctx.strokeText(this.highScore, 90, 50)
-		this.ctx.fillText(this.highScore, 90, 50)
+		this.ctx.strokeText(this.highScore, 65, 50)
+		this.ctx.fillText(this.highScore, 65, 50)
 	}
 }
 
 export default Score;
-
