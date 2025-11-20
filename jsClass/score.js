@@ -18,8 +18,8 @@ class Score {
 	increase() {
 		this.score++;
 		this.config.SPEED += 0.01
-		this.config.SCORE_S.play();
-		this.config.SCORE_S.currentTime = 0;
+		// this.config.SCORE_S.play();
+		// this.config.SCORE_S.currentTime = 0;
 	}
 
 	// Проверка рекорда
@@ -66,3 +66,4 @@ class Score {
 }
 
 export default Score;
+
