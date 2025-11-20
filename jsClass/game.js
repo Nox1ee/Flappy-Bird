@@ -16,7 +16,7 @@ class Game {
 		this.canvas.width = 431 // ширина поля
 		
 		this.BG_IMG = new Image() // объект изображения
-		this.BG_SRC = './img/bg.png'
+		this.BG_SRC = './img/bg.png' 
 
 		this.config = new Config() // экземпляр конфига
 		this.pipes = [new Pipe(this.canvas)] // экземпляр труб
@@ -25,7 +25,6 @@ class Game {
 		this.score = new Score(this.canvas) // экземпляр счета очков
 
 		this.request = 0
-		this.request1 = 0
 
 		this.lastTime = 0;
         this.deltaTime = 0;
@@ -33,9 +32,23 @@ class Game {
         this.fixedTimeStep = 1000 / 60; // 60 FPS
 	}
 
+	async loadAssets() {
+		await Promise.all([
+			this.config.FLAP,
+			this.config.HIT,
+			this.config.SCORE_S,
+			this.config.DIE,
+			this.config.SWOOSHING,
+			loadImage(this.BG_IMG, this.BG_SRC), // грузим фоновое изображение
+			Pipe.preloadImage(), // грузим трубы
+			Ground.preloadImage(), // грузим землю
+			Bird.preloadImage(), // грузим птичку
+		])
+	}
+
 	// Запуск игры по нажатию
 	launch = () => {
-		// this.config.SWOOSHING.play();
+		this.config.SWOOSHING.play();
 		window.cancelAnimationFrame(this.request)
 		this.gameLoop()
 		document.removeEventListener('mousedown', this.launch, true)
@@ -48,8 +61,22 @@ class Game {
 		this.initializeControls() // управление птичкой
 
 		// Отрисовываем птичку и другие элементы до начала игры
-		const render = () => {
-			this.config.INDEX += 0.3
+		const render = (currentTime = 0) => {
+			this.deltaTime = currentTime - this.lastTime;
+			this.lastTime = currentTime;
+
+			// Ограничиваем максимальный deltaTime для избежания "spiral of death"
+			if (this.deltaTime > 100) this.deltaTime = 100;
+
+			this.accumulator += this.deltaTime;
+
+			while (this.accumulator >= this.fixedTimeStep) {
+				this.accumulator -= this.fixedTimeStep;
+			}
+
+			const deltaFactor = this.deltaTime / this.fixedTimeStep; // Нормализуем к 60 FPS
+
+			this.config.INDEX += 1 * deltaFactor
 
 			this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height) // Фон
 			this.ground.draw() // Земля
@@ -57,7 +84,7 @@ class Game {
 
 			this.request = window.requestAnimationFrame(render)
 		}
-		this.request = window.requestAnimationFrame(render)
+		window.requestAnimationFrame(render)
 
 
 		document.addEventListener('mousedown', this.launch, true)
@@ -87,19 +114,21 @@ class Game {
 			
 			while (this.accumulator >= this.fixedTimeStep) {
 				this.update(this.fixedTimeStep);
-				this.render(this.fixedTimeStep);
 				this.accumulator -= this.fixedTimeStep;
 			}
 			
 			let requestId = window.requestAnimationFrame((time) => game(time));
 
+
 			// Проверка коллизии
 			if (this.checkCollisions()) {
-				// this.config.HIT.play();
-				// this.config.DIE.play();
+				this.config.HIT.play();
+				this.config.DIE.play();
 				window.cancelAnimationFrame(requestId);
 				this.restart();
         	}
+
+			this.render(this.deltaTime);
 		}
         
         window.requestAnimationFrame(game);
@@ -146,10 +175,10 @@ class Game {
     }
 
 	render(deltaTime) {
-		const deltaFactor = deltaTime / (1000 / 60); // Нормализуем к 60 FPS
-		
-		this.config.INDEX += 0.3 * deltaFactor;
+		const deltaFactor = deltaTime / this.fixedTimeStep; // Нормализуем к 60 FPS
 
+		this.config.INDEX += 1 * deltaFactor
+		
         // Отрисовка фона
         this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height);
         
@@ -209,23 +238,6 @@ class Game {
 	handleFlap = event => {
 		if (event.type === 'keydown' && event.code !== 'Space') return
 		this.bird.flap()
-	}
-
-	async loadAssets() {
-		await Promise.all([
-			loadImage(this.BG_IMG, this.BG_SRC), // грузим фоновое изображение
-			Pipe.preloadImage(), // грузим трубы
-			Ground.preloadImage(), // грузим землю
-			Bird.preloadImage(), // грузим птичку
-		])
-	}
-
-	loadImage(img, src) {
-		return new Promise((resolve, reject) => {
-			img.onload = resolve
-			img.onerror = reject
-			img.src = src
-		})
 	}
 }
 export default Game;
