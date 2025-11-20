@@ -18,6 +18,15 @@ class Game {
 		this.BG_IMG = new Image() // объект изображения
 		this.BG_SRC = './img/bg.png' 
 
+		this.soundFiles = [
+			this.FLAP = ('./audio/sfx_flap.wav'),
+        	this.HIT = ('./audio/sfx_hit.wav'),
+        	this.SCORE_S = ('./audio/sfx_point.wav'),
+        	this.DIE = ('./audio/sfx_die.wav'),
+		]
+
+		this.sounds = {};
+
 		this.config = new Config() // экземпляр конфига
 		this.pipes = [new Pipe(this.canvas)] // экземпляр труб
 		this.ground = new Ground(this.canvas) // экземпляр земли
@@ -32,8 +41,25 @@ class Game {
         this.fixedTimeStep = 1000 / 60; // 60 FPS
 	}
 
+	preloadSounds() {
+		let promises = this.soundFiles.map(file => {
+			return new Promise((resolve, reject) => {
+				const audio = new Audio(file);
+				audio.onloadeddata = () => {
+					this.sounds[file] = audio; // Сохраняем загруженный звук
+					resolve();
+				};
+				audio.onerror = () => reject(new Error(`Не удалось загрузить звук: ${file}`));
+				audio.load(); // Запускаем загрузку
+			});
+		});
+
+		return Promise.all(promises); // Возвращаем промис, который резолвится, когда все звуки загружены
+	}
+
 	async loadAssets() {
 		await Promise.all([
+			this.preloadSounds(),
 			loadImage(this.BG_IMG, this.BG_SRC), // грузим фоновое изображение
 			Pipe.preloadImage(), // грузим трубы
 			Ground.preloadImage(), // грузим землю
@@ -113,8 +139,11 @@ class Game {
 			
 			let requestId = window.requestAnimationFrame((time) => game(time));
 
+
 			// Проверка коллизии
 			if (this.checkCollisions()) {
+				this.sounds[this.HIT].play();
+				this.sounds[this.DIE].play();
 				window.cancelAnimationFrame(requestId);
 				this.restart();
         	}
@@ -158,6 +187,8 @@ class Game {
 		for (let pipe of this.pipes) {
 			if ((pipe.x < this.bird.x) && (!pipe.scored)) {
 				this.score.increase();
+				this.sounds[this.SCORE_S].play();
+				this.sounds[this.SCORE_S].currentTime = 0;
 				pipe.scored = true;
 			}
 		}
@@ -229,6 +260,8 @@ class Game {
 	handleFlap = event => {
 		if (event.type === 'keydown' && event.code !== 'Space') return
 		this.bird.flap()
+		this.sounds[this.FLAP].play();
+		this.sounds[this.FLAP].currentTime = 0;
 	}
 }
 export default Game;
