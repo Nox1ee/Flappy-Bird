@@ -100,7 +100,7 @@ class Game {
 				this.restart();
         	}
 
-			this.render();
+			this.render(this.fixedTimeStep);
 		}
         
         window.requestAnimationFrame(game);
@@ -146,8 +146,8 @@ class Game {
 		this.score.checkHighScore(); // Проверяем был ли побит рекорд
     }
 
-	render() {
-		this.config.INDEX += 0.3;
+	render(deltaFactor) {
+		this.config.INDEX += 0.3 * deltaFactor;
 
         // Отрисовка фона
         this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height);
