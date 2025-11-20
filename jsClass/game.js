@@ -87,6 +87,7 @@ class Game {
 			
 			while (this.accumulator >= this.fixedTimeStep) {
 				this.update(this.fixedTimeStep);
+				this.render(this.fixedTimeStep);
 				this.accumulator -= this.fixedTimeStep;
 			}
 			
@@ -99,8 +100,6 @@ class Game {
 				window.cancelAnimationFrame(requestId);
 				this.restart();
         	}
-
-			this.render();
 		}
         
         window.requestAnimationFrame(game);
@@ -146,8 +145,10 @@ class Game {
 		this.score.checkHighScore(); // Проверяем был ли побит рекорд
     }
 
-	render() {
-		this.config.INDEX += 0.5;
+	render(deltaTime) {
+		const deltaFactor = deltaTime / (1000 / 60); // Нормализуем к 60 FPS
+		
+		this.config.INDEX += 0.3 * deltaFactor;
 
         // Отрисовка фона
         this.ctx.drawImage(this.BG_IMG, 0, 0, this.canvas.width, this.canvas.height);
