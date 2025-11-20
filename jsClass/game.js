@@ -35,7 +35,7 @@ class Game {
 
 	// Запуск игры по нажатию
 	launch = () => {
-		this.config.SWOOSHING.play();
+		// this.config.SWOOSHING.play();
 		window.cancelAnimationFrame(this.request)
 		this.gameLoop()
 		document.removeEventListener('mousedown', this.launch, true)
@@ -94,8 +94,8 @@ class Game {
 
 			// Проверка коллизии
 			if (this.checkCollisions()) {
-				this.config.HIT.play();
-				this.config.DIE.play();
+				// this.config.HIT.play();
+				// this.config.DIE.play();
 				window.cancelAnimationFrame(requestId);
 				this.restart();
         	}
