@@ -1,21 +1,7 @@
 class Config {
     constructor() {
-        // Для мобильных устройств предзагружаем аудио
-        // this.FLAP = this.createAudio('./audio/sfx_flap.wav');
-        // this.HIT = this.createAudio('./audio/sfx_hit.wav');
-        // this.SCORE_S = this.createAudio('./audio/sfx_point.wav');
-        // this.DIE = this.createAudio('./audio/sfx_die.wav');
-        // this.SWOOSHING = this.createAudio('./audio/sfx_swooshing.wav');
     }
-
-    // createAudio(src) {
-    //     const audio = new Audio();
-    //     audio.preload = 'auto';
-    //     audio.src = src;
-    //     audio.load();
-    //     return audio;
-    // }
-
+    
     pipe = {
         width: 66, // Ширина трубы
         height: 520, // Высота трубы
@@ -41,4 +27,5 @@ class Config {
     frameCount = 0 // Количетсво кадров
 }
 export default Config;
+
 
