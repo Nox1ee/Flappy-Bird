@@ -142,8 +142,8 @@ class Game {
 
 			// Проверка коллизии
 			if (this.checkCollisions()) {
-				this.sounds[this.HIT].play();
-				this.sounds[this.DIE].play();
+				// this.sounds[this.HIT].play();
+				// this.sounds[this.DIE].play();
 				window.cancelAnimationFrame(requestId);
 				this.restart();
         	}
@@ -187,8 +187,8 @@ class Game {
 		for (let pipe of this.pipes) {
 			if ((pipe.x < this.bird.x) && (!pipe.scored)) {
 				this.score.increase();
-				this.sounds[this.SCORE_S].play();
-				this.sounds[this.SCORE_S].currentTime = 0;
+				// this.sounds[this.SCORE_S].play();
+				// this.sounds[this.SCORE_S].currentTime = 0;
 				pipe.scored = true;
 			}
 		}
@@ -260,8 +260,8 @@ class Game {
 	handleFlap = event => {
 		if (event.type === 'keydown' && event.code !== 'Space') return
 		this.bird.flap()
-		this.sounds[this.FLAP].play();
-		this.sounds[this.FLAP].currentTime = 0;
+		// this.sounds[this.FLAP].play(); 
+		// this.sounds[this.FLAP].currentTime = 0;
 	}
 }
 export default Game;
